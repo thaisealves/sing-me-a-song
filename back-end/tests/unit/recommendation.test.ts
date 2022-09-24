@@ -75,4 +75,67 @@ describe("Testing upvote from recommendations service", () => {
   });
 });
 
+describe("Testing downvote from recommendations service", () => {
+  it("Should put an downvote on an existing recommendation with the score greater than -5", async () => {
+    const findingRecommendation = findRecommendationFactory();
+    jest
+      .spyOn(recommendationRepository, "find")
+      .mockImplementationOnce((): any => {
+        return findingRecommendation;
+      });
+    jest
+      .spyOn(recommendationRepository, "updateScore")
+      .mockImplementationOnce((): any => {
+        return { ...findingRecommendation, score: 3 };
+      });
+    jest
+      .spyOn(recommendationRepository, "remove")
+      .mockImplementationOnce((): any => {});
+    await recommendationService.downvote(findingRecommendation.id);
 
+    expect(recommendationRepository.find).toBeCalled();
+    expect(recommendationRepository.updateScore).toBeCalled();
+    expect(recommendationRepository.remove).not.toBeCalled();
+  });
+
+  it("Should not put an downvote on a non-existing recommendation", async () => {
+    const findingRecommendation = findRecommendationFactory();
+    jest
+      .spyOn(recommendationRepository, "find")
+      .mockImplementationOnce((): any => {
+        return null;
+      });
+
+    const promisse = recommendationService.downvote(findingRecommendation.id);
+
+    expect(promisse).rejects.toEqual({
+      type: "not_found",
+      message: "",
+    });
+    expect(recommendationRepository.find).toBeCalled();
+    expect(recommendationRepository.updateScore).not.toBeCalled();
+  });
+
+  it("Should remove a recommendation if the score is lower than -5", async () => {
+    const findingRecommendation = findRecommendationFactory();
+    jest
+      .spyOn(recommendationRepository, "find")
+      .mockImplementationOnce((): any => {
+        return findingRecommendation;
+      });
+    jest
+      .spyOn(recommendationRepository, "updateScore")
+      .mockImplementationOnce((): any => {
+        return { ...findingRecommendation, score: -6 };
+      });
+    jest
+      .spyOn(recommendationRepository, "remove")
+      .mockImplementationOnce((): any => {});
+
+    await recommendationService.downvote(findingRecommendation.id);
+
+    expect(recommendationRepository.find).toBeCalled();
+    expect(recommendationRepository.updateScore).toBeCalled();
+    expect(recommendationRepository.remove).toBeCalled();
+  });
+});
