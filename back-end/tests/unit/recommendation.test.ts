@@ -1,6 +1,8 @@
+import { faker } from "@faker-js/faker";
 import { jest } from "@jest/globals";
 import { recommendationRepository } from "../../src/repositories/recommendationRepository";
 import { recommendationService } from "../../src/services/recommendationsService";
+import { findRecommendationFactory } from "../factories/findRecommendationFactory";
 import { recommendationFactory } from "../factories/recommendationFactory";
 beforeEach(() => {
   jest.resetAllMocks();
@@ -38,7 +40,39 @@ describe("Testing the insert from recommendations service", () => {
 });
 
 describe("Testing upvote from recommendations service", () => {
-  it.todo("Should put an upvote on an existing recommendation", async ()=>{
-    jest.spyOn(recommendationRepository, "find").mockImplementation(():any=>{})
+  it("Should put an upvote on an existing recommendation", async () => {
+    const findingRecommendation = findRecommendationFactory();
+    jest
+      .spyOn(recommendationRepository, "find")
+      .mockImplementationOnce((): any => {
+        return findingRecommendation;
+      });
+    jest
+      .spyOn(recommendationRepository, "updateScore")
+      .mockImplementationOnce((): any => {});
+    await recommendationService.upvote(findingRecommendation.id);
+
+    expect(recommendationRepository.find).toBeCalled();
+    expect(recommendationRepository.updateScore).toBeCalled();
+  });
+
+  it("Should not put an upvote on a non-existing recommendation", async () => {
+    const findingRecommendation = findRecommendationFactory();
+    jest
+      .spyOn(recommendationRepository, "find")
+      .mockImplementationOnce((): any => {
+        return null;
+      });
+
+    const promisse = recommendationService.upvote(findingRecommendation.id);
+
+    expect(promisse).rejects.toEqual({
+      type: "not_found",
+      message: "",
+    });
+    expect(recommendationRepository.find).toBeCalled();
+    expect(recommendationRepository.updateScore).not.toBeCalled();
   });
 });
+
+
