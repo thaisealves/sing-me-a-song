@@ -137,8 +137,24 @@ describe("Testing all the routes from the app", () => {
   it("Must return not found error if id doens't exists from recommendation by id", async () => {
     const posted = await insertingRecommendation();
 
-    const result = await supertest(app).get(`/recommendations/${posted.id+1}`);
+    const result = await supertest(app).get(
+      `/recommendations/${posted.id + 1}`
+    );
 
+    expect(result.status).toBe(404);
+    expect(result.body).toEqual({});
+  });
+  it("Must return an random recommendation", async () => {
+    await insertingRecommendation();
+
+    const result = await supertest(app).get(`/recommendations/random`);
+
+    expect(result.status).toBe(200);
+    expect(result.body).toBeInstanceOf(Object);
+  });
+  it("Must return 404 if there's no recommendation on random", async () => {
+    const result = await supertest(app).get(`/recommendations/random`);
+    console.log(result.body);
     expect(result.status).toBe(404);
     expect(result.body).toEqual({});
   });
