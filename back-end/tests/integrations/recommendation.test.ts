@@ -125,5 +125,21 @@ describe("Testing all the routes from the app", () => {
     expect(result.status).toBe(200);
     expect(result.body).toEqual([]);
   });
-  
+
+  it("Must return the recommendation by id", async () => {
+    const posted = await insertingRecommendation();
+
+    const result = await supertest(app).get(`/recommendations/${posted.id}`);
+
+    expect(result.status).toBe(200);
+    expect(result.body).toEqual(posted);
+  });
+  it("Must return not found error if id doens't exists from recommendation by id", async () => {
+    const posted = await insertingRecommendation();
+
+    const result = await supertest(app).get(`/recommendations/${posted.id+1}`);
+
+    expect(result.status).toBe(404);
+    expect(result.body).toEqual({});
+  });
 });
