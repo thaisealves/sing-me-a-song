@@ -4,6 +4,7 @@ import app from "../../src/app";
 import { prisma } from "../../src/database";
 import { faker } from "@faker-js/faker";
 import { insertingRecommendation } from "../factories/insertingRecommendation";
+import { recommendationListFactory } from "../factories/recommendationListFactory";
 beforeEach(async () => {
   await prisma.$executeRaw`TRUNCATE TABLE "recommendations"`;
 });
@@ -110,4 +111,19 @@ describe("Testing all the routes from the app", () => {
     expect(lastDownvote.status).toBe(200);
     expect(removed).toBeNull();
   });
+
+  it("Must return an array with recommendations", async () => {
+    const posted = await insertingRecommendation();
+
+    const result = await supertest(app).get("/recommendations/");
+
+    expect(result.status).toBe(200);
+    expect(result.body).toEqual([posted]);
+  });
+  it("Must return an empty array when there's no recommendation", async () => {
+    const result = await supertest(app).get("/recommendations/");
+    expect(result.status).toBe(200);
+    expect(result.body).toEqual([]);
+  });
+  
 });
