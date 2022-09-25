@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/server.ts",
+    "test": "dotenv -e .env.test prisma migrate dev && dotenv -e .env.test jest -- -i --no-cache",
     "test:unit": "dotenv -e .env.test jest -- -i --coverage --testPathPattern=tests/unit"
   },
   "keywords": [],
