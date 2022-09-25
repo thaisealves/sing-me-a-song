@@ -9,7 +9,6 @@ import {
   recommendationOrderedListFactory,
 } from "../factories/recommendationListFactory";
 beforeEach(() => {
-  jest.resetAllMocks();
   jest.clearAllMocks();
 });
 
@@ -68,9 +67,9 @@ describe("Testing upvote from recommendations service", () => {
         return null;
       });
 
-    const promisse = recommendationService.upvote(findingRecommendation.id);
+    const promise = recommendationService.upvote(findingRecommendation.id);
 
-    expect(promisse).rejects.toEqual({
+    expect(promise).rejects.toEqual({
       type: "not_found",
       message: "",
     });
@@ -110,9 +109,9 @@ describe("Testing downvote from recommendations service", () => {
         return null;
       });
 
-    const promisse = recommendationService.downvote(findingRecommendation.id);
+    const promise = recommendationService.downvote(findingRecommendation.id);
 
-    expect(promisse).rejects.toEqual({
+    expect(promise).rejects.toEqual({
       type: "not_found",
       message: "",
     });
@@ -171,5 +170,50 @@ describe("Testing the gets from the recommendations service", () => {
     expect(recommendationRepository.getAmountByScore).toBeCalled();
   });
 
- 
+  it("Should return a random recommendation", async () => {
+    const allSongs = recommendationListFactory(10);
+    const recommendations = allSongs.map((el) => {
+      return { ...el, score: faker.datatype.number({ min: -4, max: 10 }) };
+    });
+
+    jest.spyOn(Math, "random").mockReturnValueOnce(0.8);
+    jest
+      .spyOn(recommendationRepository, "findAll")
+      .mockImplementationOnce((): any => {
+        return recommendations;
+      });
+
+    const result = await recommendationService.getRandom();
+    expect(recommendationRepository.findAll).toBeCalled();
+    expect(result.score).toBeLessThanOrEqual(10);
+  });
+
+  it("Should return a random recommendation", async () => {
+    const allSongs = recommendationListFactory(10);
+    const recommendations = allSongs.map((el) => {
+      return { ...el, score: faker.datatype.number({ min: 11 }) };
+    });
+
+    jest.spyOn(Math, "random").mockReturnValueOnce(0.6);
+    jest
+      .spyOn(recommendationRepository, "findAll")
+      .mockImplementationOnce((): any => {
+        return recommendations;
+      });
+
+    const result = await recommendationService.getRandom();
+    expect(recommendationRepository.findAll).toBeCalled();
+    expect(result.score).toBeGreaterThan(10);
+  });
+
+  it("Should return not found on random recommendation when its empty", async () => {
+    jest.spyOn(recommendationRepository, "findAll").mockResolvedValue([]);
+
+    const promise = recommendationService.getRandom();
+    expect(recommendationRepository.findAll).toBeCalled();
+    expect(promise).rejects.toEqual({
+      type: "not_found",
+      message: "",
+    });
+  });
 });
