@@ -4,6 +4,10 @@ import { recommendationRepository } from "../../src/repositories/recommendationR
 import { recommendationService } from "../../src/services/recommendationsService";
 import { findRecommendationFactory } from "../factories/findRecommendationFactory";
 import { recommendationFactory } from "../factories/recommendationFactory";
+import {
+  recommendationListFactory,
+  recommendationOrderedListFactory,
+} from "../factories/recommendationListFactory";
 beforeEach(() => {
   jest.resetAllMocks();
   jest.clearAllMocks();
@@ -138,4 +142,34 @@ describe("Testing downvote from recommendations service", () => {
     expect(recommendationRepository.updateScore).toBeCalled();
     expect(recommendationRepository.remove).toBeCalled();
   });
+});
+
+describe("Testing the gets from the recommendations service", () => {
+  it("Should return 10 last recommendations", async () => {
+    const recommendation = recommendationListFactory(10);
+    jest
+      .spyOn(recommendationRepository, "findAll")
+      .mockImplementationOnce((): any => {
+        return [recommendation];
+      });
+    const promise = recommendationService.get();
+    expect(promise).resolves.toEqual([recommendation]);
+    expect(recommendationRepository.findAll).toBeCalled();
+  });
+
+  it("Should return top recommendations with right amount", async () => {
+    const amount: number = faker.datatype.number({ min: 5, max: 100 });
+    const filteredRecommendations = recommendationOrderedListFactory(amount);
+    jest
+      .spyOn(recommendationRepository, "getAmountByScore")
+      .mockImplementationOnce((): any => {
+        return filteredRecommendations;
+      });
+    const promise = recommendationService.getTop(amount);
+    expect(promise).resolves.toEqual(filteredRecommendations);
+    expect(filteredRecommendations).toHaveLength(amount);
+    expect(recommendationRepository.getAmountByScore).toBeCalled();
+  });
+
+ 
 });
