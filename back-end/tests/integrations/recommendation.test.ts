@@ -46,7 +46,6 @@ describe("Testing all the routes from the app", () => {
   it("Must return 200 doing upvote on existing recommendation", async () => {
     const posted = await insertingRecommendation();
 
-    console.log(posted.id);
     const upvoting = await supertest(app).post(
       `/recommendations/${posted.id}/upvote`
     );
@@ -62,5 +61,53 @@ describe("Testing all the routes from the app", () => {
     );
     expect(upvoting.status).toBe(404);
     expect(posted).not.toBeNull();
+  });
+
+  it("Must return 200 doing downvote on existing recommendation", async () => {
+    const posted = await insertingRecommendation();
+
+    const downvoting = await supertest(app).post(
+      `/recommendations/${posted.id}/downvote`
+    );
+    expect(posted.score).toBeGreaterThanOrEqual(-4);
+    expect(downvoting.status).toBe(200);
+    expect(posted).not.toBeNull();
+  });
+
+  it("Must return 404 doing downvote on non-existing recommendation", async () => {
+    const posted = await insertingRecommendation();
+
+    const downvoting = await supertest(app).post(
+      `/recommendations/${posted.id + 1}/downvote`
+    );
+    expect(posted.score).toBeGreaterThanOrEqual(-4);
+    expect(downvoting.status).toBe(404);
+    expect(posted).not.toBeNull();
+  });
+
+  it("Must remove recommendation if try to downvote on score <-5", async () => {
+    const posted = await insertingRecommendation();
+    await supertest(app).post(`/recommendations/${posted.id}/downvote`);
+    await supertest(app).post(`/recommendations/${posted.id}/downvote`);
+    await supertest(app).post(`/recommendations/${posted.id}/downvote`);
+    await supertest(app).post(`/recommendations/${posted.id}/downvote`);
+    await supertest(app).post(`/recommendations/${posted.id}/downvote`);
+    const downvote = await prisma.recommendation.findUnique({
+      where: {
+        name: posted.name,
+      },
+    });
+    const lastDownvote = await supertest(app).post(
+      `/recommendations/${posted.id}/downvote`
+    );
+
+    const removed = await prisma.recommendation.findUnique({
+      where: {
+        name: posted.name,
+      },
+    });
+    expect(downvote.score).toBeLessThan(-4);
+    expect(lastDownvote.status).toBe(200);
+    expect(removed).toBeNull();
   });
 });
