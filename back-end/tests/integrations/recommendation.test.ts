@@ -43,5 +43,24 @@ describe("Testing all the routes from the app", () => {
     expect(posted).toBeNull();
   });
 
+  it("Must return 200 doing upvote on existing recommendation", async () => {
+    const posted = await insertingRecommendation();
 
+    console.log(posted.id);
+    const upvoting = await supertest(app).post(
+      `/recommendations/${posted.id}/upvote`
+    );
+    expect(upvoting.status).toBe(200);
+    expect(posted).not.toBeNull();
+  });
+
+  it("Must return 404 doing upvote on non-existing recommendation", async () => {
+    const posted = await insertingRecommendation();
+
+    const upvoting = await supertest(app).post(
+      `/recommendations/${posted.id + 1}/upvote`
+    );
+    expect(upvoting.status).toBe(404);
+    expect(posted).not.toBeNull();
+  });
 });
