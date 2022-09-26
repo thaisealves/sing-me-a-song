@@ -77,6 +77,44 @@ describe("Testing all the gets for recommendations", () => {
     cy.get('[data-cy="recommendation"]').should("have.length", 0);
   });
 
+  it("Must return top recommendations, on right order", () => {
+    cy.createRecommendation();
+    cy.createRecommendation();
+    cy.visit("http://localhost:3000/");
+
+    cy.intercept("POST", "http://localhost:5000/recommendations/**/upvote").as(
+      "newUpvote"
+    );
+    let score1;
+    cy.get('[data-cy="recommendation"]')
+      .first()
+      .get('[data-cy="upvote"]')
+      .first()
+      .click();
+
+    cy.wait("@newUpvote");
+
+    cy.get('[data-cy="top"]').click();
+    cy.url().should("equal", "http://localhost:3000/top");
+
+    cy.get('[data-cy="recommendation"]')
+      .eq(0)
+      .get('[data-testid="num"]')
+      .eq(0)
+      .should(($span) => {
+        score1 = parseInt($span.text());
+      });
+
+    cy.get('[data-cy="recommendation"]')
+      .eq(1)
+      .get('[data-testid="num"]')
+      .eq(1)
+      .should(($span) => {
+        const score2 = parseInt($span.text());
+        expect(score2).to.be.lessThan(score1);
+      });
+  });
+  
   it("See if video works", () => {
     cy.visit("http://localhost:3000/");
 
