@@ -28,4 +28,23 @@ describe("Testing all the gets for recommendations", () => {
 
     cy.get('[data-cy="recommendation"]').should("have.length", 0);
   });
+
+  it("Should get random recommendation", () => {
+    cy.visit("http://localhost:3000/");
+    cy.createRecommendation();
+    cy.get('[data-cy="random"]').click();
+
+    cy.url().should("equal", "http://localhost:3000/random");
+
+    cy.get('[data-cy="recommendation"]').should("have.length", 1);
+  });
+
+  it("Random should be empty if there's no recommendation", () => {
+    cy.visit("http://localhost:3000/");
+    cy.get('[data-cy="random"]').click();
+
+    cy.url().should("equal", "http://localhost:3000/random");
+    cy.visit("http://localhost:3000/random");
+    cy.get('[data-cy="recommendation"]').should("have.length", 0);
+  });
 });
