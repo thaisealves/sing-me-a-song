@@ -76,4 +76,24 @@ describe("Testing all the gets for recommendations", () => {
 
     cy.get('[data-cy="recommendation"]').should("have.length", 0);
   });
+
+  it("See if video works", () => {
+    cy.visit("http://localhost:3000/");
+
+    const recommendation = {
+      name: "never be the same",
+      youtubeLink:
+        "https://www.youtube.com/watch?v=Ph54wQG8ynk&ab_channel=CamilaCabelloVEVO",
+    };
+    cy.get('[data-cy="name"]').type(recommendation.name);
+    cy.get('[data-cy="youtubeLink"]').type(recommendation.youtubeLink);
+    cy.get('[data-cy="submit"]').click();
+
+    cy.get('[data-cy="recommendation"]')
+      .first()
+      .get('[data-cy="video"]')
+      .click();
+  });
+
+
 });
