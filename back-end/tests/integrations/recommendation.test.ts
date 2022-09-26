@@ -119,6 +119,7 @@ describe("Testing all the routes from the app", () => {
 
     expect(result.status).toBe(200);
     expect(result.body).toEqual([posted]);
+    expect(result.body).toBeInstanceOf(Array);
   });
   it("Must return an empty array when there's no recommendation", async () => {
     const result = await supertest(app).get("/recommendations/");
@@ -154,8 +155,23 @@ describe("Testing all the routes from the app", () => {
   });
   it("Must return 404 if there's no recommendation on random", async () => {
     const result = await supertest(app).get(`/recommendations/random`);
-    console.log(result.body);
     expect(result.status).toBe(404);
     expect(result.body).toEqual({});
+  });
+  it("Must return the top recommendations", async () => {
+    await insertingRecommendation();
+    await insertingRecommendation();
+
+    const result = await supertest(app).get(`/recommendations/top/2`);
+
+    expect(result.status).toBe(200);
+    expect(result.body).toBeInstanceOf(Array);
+    expect(result.body).toHaveLength(2)
+  });
+  it("Must return an empty array on top recommendations", async () => {
+    const result = await supertest(app).get(`/recommendations/top/2`);
+    expect(result.status).toBe(200);
+    expect(result.body).toEqual([])
+    expect(result.body).toBeInstanceOf(Array);
   });
 });
