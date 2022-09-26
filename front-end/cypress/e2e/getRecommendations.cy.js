@@ -22,4 +22,10 @@ describe("Testing all the gets for recommendations", () => {
 
     cy.get('[data-cy="recommendation"]').should("have.length", 10);
   });
+
+  it("Should be empty if there's no recommendations", () => {
+    cy.visit("http://localhost:3000/");
+
+    cy.get('[data-cy="recommendation"]').should("have.length", 0);
+  });
 });
