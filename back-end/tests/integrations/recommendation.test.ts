@@ -6,7 +6,7 @@ import { faker } from "@faker-js/faker";
 import { insertingRecommendation } from "../factories/insertingRecommendation";
 import { recommendationListFactory } from "../factories/recommendationListFactory";
 beforeEach(async () => {
-  await prisma.$executeRaw`TRUNCATE TABLE "recommendations"`;
+  await prisma.$executeRaw`TRUNCATE TABLE "recommendations" RESTART IDENTITY`;
 });
 
 describe("Testing all the routes from the app", () => {
@@ -175,3 +175,8 @@ describe("Testing all the routes from the app", () => {
     expect(result.body).toBeInstanceOf(Array);
   });
 });
+
+afterAll(async () => {
+    await prisma.$disconnect();
+  });
+  
