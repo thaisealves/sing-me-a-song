@@ -47,4 +47,33 @@ describe("Testing all the gets for recommendations", () => {
     cy.visit("http://localhost:3000/random");
     cy.get('[data-cy="recommendation"]').should("have.length", 0);
   });
+
+  it("Should get only 10 top recommendations", () => {
+    cy.visit("http://localhost:3000/");
+
+    //creating multiple recommendations to certify it only shows ten
+    for (let i = 0; i < 11; i++) {
+      const recommendation = {
+        name: faker.lorem.words(2),
+        youtubeLink:
+          "https://www.youtube.com/watch?v=" + faker.random.alphaNumeric(5),
+      };
+      cy.get('[data-cy="name"]').type(recommendation.name);
+      cy.get('[data-cy="youtubeLink"]').type(recommendation.youtubeLink);
+      cy.get('[data-cy="submit"]').click();
+    }
+
+    cy.get('[data-cy="top"]').click();
+
+    cy.url().should("equal", "http://localhost:3000/top");
+    cy.get('[data-cy="recommendation"]').should("have.length", 10);
+  });
+  it("Should have no recommendations if its empty", () => {
+    cy.visit("http://localhost:3000/");
+    cy.get('[data-cy="top"]').click();
+
+    cy.url().should("equal", "http://localhost:3000/top");
+
+    cy.get('[data-cy="recommendation"]').should("have.length", 0);
+  });
 });
