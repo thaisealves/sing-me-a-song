@@ -47,6 +47,8 @@ POST /recommendations
 
 ####
 
+---
+
 ### Upvote
 
 Entering the application
@@ -63,6 +65,8 @@ POST /recommendations/:id/upvote
 
 ####
 
+---
+
 ### Downvote
 
 Entering the application
@@ -78,6 +82,8 @@ POST /recommendations/:id/downvote
 | `id`   | **Required**. Id from the recommendation you want to downvote |
 
 ####
+
+---
 
 ### Get last 10 recommendations
 
@@ -107,6 +113,8 @@ GET /recommendations
 ```
 
 ####
+
+---
 
 ### Get top recommendations
 
@@ -143,6 +151,8 @@ GET /recommendations/top/:amount
 
 ####
 
+---
+
 ### Get recommendation by ID
 
 Seeing one recommendation that was required by ID.
@@ -170,6 +180,8 @@ GET /recommendations/:id
 
 ####
 
+---
+
 ### Get a random recommendation from the application
 
 Seeing one recommendation that the application will choose.
@@ -190,6 +202,8 @@ GET /recommendations/random
 ```
 
 ####
+
+---
 
 ### Starting the application for tests:
 
