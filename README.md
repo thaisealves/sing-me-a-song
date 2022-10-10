@@ -1,5 +1,5 @@
 <div align="center">
-<h1>RepoProvas</h1>
+<h1>Sing Me a Song</h1>
 </div>
 
 # Description
