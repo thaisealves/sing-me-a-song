@@ -42,7 +42,7 @@ POST /recommendations
 
 | Body          | Type     | Description                                                       |
 | :------------ | :------- | :---------------------------------------------------------------- |
-| `name`        | `email`  | **Required and Unique**. The name of the song you're recommending |
+| `name`        | `string`  | **Required and Unique**. The name of the song you're recommending |
 | `youtubeLink` | `string` | **Required**. YouTube link from the song                          |
 
 ####
@@ -51,7 +51,7 @@ POST /recommendations
 
 ### Upvote
 
-Entering the application
+Getting a upvote for the recommendation
 
 ```http
 POST /recommendations/:id/upvote
@@ -69,7 +69,7 @@ POST /recommendations/:id/upvote
 
 ### Downvote
 
-Entering the application
+Getting a downvote for the recommendation
 
 ```http
 POST /recommendations/:id/downvote
